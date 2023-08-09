@@ -1,6 +1,6 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was for MolSSI Education Platform frontend with the intention to be intergrated to OpenEdx devstack. 
 
 ## Available Scripts
 
