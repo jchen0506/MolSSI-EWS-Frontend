@@ -1,15 +1,16 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function BasicSelect() {
-	const [bse, setBSE] = React.useState('');
+export default function BSESelector({ onChange }) {
+	const [basis_set, setBasisSet] = React.useState('');
 
-	const handleChange = (event) => {
-		setBSE(event.target.value);
+	const handleBasisSetChange = (event) => {
+		setBasisSet(event.target.value);
+		onChange(event.target.value);
 	};
 
 	return (
@@ -19,11 +20,11 @@ export default function BasicSelect() {
 				<Select
 					labelId="BSE-select-label"
 					id="BSE-select"
-					value={bse}
 					label="Basis Set"
-					onChange={handleChange}
+					onChange={handleBasisSetChange}
+					value={basis_set}
 				>
-					<MenuItem value={'aug-cc-pVDZ'}> aug-cc-pVDZ</MenuItem>
+					<MenuItem value={'aug-pcseg-4'}>aug-pcseg-4</MenuItem>
 					<MenuItem value={'aug-cc-pVDZ'}>aug-cc-pVDZ</MenuItem>
 				</Select>
 			</FormControl>
