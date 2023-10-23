@@ -20,7 +20,7 @@ const VisuallyHiddenInput = styled('input')({
 	width: 1,
 });
 
-export default function FormPropsTextFields() {
+export default function FormPropsTextFields({ onPostSuccess }) {
 	const [calculation, setCalculation] = useState("optimize");
 	const [molecule, setMolecule] = useState("");
 	const [basis_set, setBasisSet] = useState("");
@@ -61,7 +61,7 @@ export default function FormPropsTextFields() {
 		};
 
 		console.log(inputData);
-		// const inputData = require('./utilities/psi4_test.json');
+
 		try {
 			const response = await fetch(apiUrl, {
 				method: 'POST',
@@ -71,13 +71,12 @@ export default function FormPropsTextFields() {
 				body: JSON.stringify(inputData),
 			});
 
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
+			if (response.ok) {
+				const responseData = await response.json();
+				onPostSuccess();
+				console.log("post request successfully sent")
+				console.log(responseData);
 			}
-
-			const responseData = await response.json();
-			console.log("post request successfully sent")
-			console.log(responseData);
 		} catch (error) {
 			setError(error);
 		}

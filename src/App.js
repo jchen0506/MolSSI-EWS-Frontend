@@ -1,4 +1,5 @@
 // import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -9,6 +10,7 @@ import NavBar from './NavBar';
 import Lecture from './Lecture';
 import Quiz from './Quiz'
 import InputForm from './InputForm';
+import Result from './Result'
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -19,6 +21,13 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
+	const [formSubmitted, setFormSubmitted] = useState(false);
+
+	const handlePostSuccess = () => {
+		console.log("handlePostSuccess");
+		setFormSubmitted(true);
+	};
+
 	return (
 		<div className="App">
 			<NavBar />
@@ -40,11 +49,15 @@ function App() {
 				<Grid container spacing={2}>
 					<Grid item xs={6} md={6}>
 						<Item>
-							<InputForm />
+							<InputForm onPostSuccess={handlePostSuccess} />
 						</Item>
 					</Grid>
 					<Grid item xs={6} md={6}>
-						<Item>Result</Item>
+						<Item>Result
+						</Item>
+						<Item>
+							{formSubmitted && <Result />}
+						</Item>
 					</Grid>
 				</Grid>
 			</Box>
