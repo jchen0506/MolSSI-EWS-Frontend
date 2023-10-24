@@ -11,7 +11,6 @@ export default function Result() {
 				if (response.ok) {
 					const data = await response.json();
 					setResult(data);
-					console.log(data);
 				}
 			} catch (error) {
 				throw new Error(error.message);

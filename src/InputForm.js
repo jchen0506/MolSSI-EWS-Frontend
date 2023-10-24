@@ -27,7 +27,6 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 	const [freeze_core, setFreezeCore] = useState("");
 	const [reference, setReference] = useState("");
 	const [method, setMethod] = useState("");
-	const [error, setError] = useState(null);
 
 	const handleMoleculeChange = (event) => {
 		setMolecule(event.target.value);
@@ -49,6 +48,19 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 		setMethod(value);
 	}
 
+	const handleMoleculeUpload = (e) => {
+		const file = e.target.files[0];
+		const reader = new FileReader();
+
+		reader.onload = (event) => {
+			const content = event.target.result;
+			setMolecule(content);
+		};
+
+		reader.readAsText(file);
+	};
+
+
 	const postData = async () => {
 		const apiUrl = 'http://127.0.0.1:5000/run_data';
 		const inputData = {
@@ -59,9 +71,7 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 			reference: reference,
 			method: method,
 		};
-
 		console.log(inputData);
-
 		try {
 			const response = await fetch(apiUrl, {
 				method: 'POST',
@@ -74,11 +84,9 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 			if (response.ok) {
 				const responseData = await response.json();
 				onPostSuccess();
-				console.log("post request successfully sent")
-				console.log(responseData);
 			}
 		} catch (error) {
-			setError(error);
+			throw new Error(error.message);
 		}
 	}
 
@@ -101,10 +109,7 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 					variant="standard"
 					onChange={handleMoleculeChange}
 				/>
-				<Button component="label" variant="contained" startIcon={<CloudUploadIcon />}>
-					Upload file
-					<VisuallyHiddenInput type="file" />
-				</Button>
+				<input type="file" onChange={handleMoleculeUpload} />
 				<br />
 				<br />
 				<BSESelector onChange={handleBasisSetChange} />
@@ -127,6 +132,6 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 					variant="contained">submit
 				</Button>
 			</div>
-		</Box>
+		</Box >
 	);
 }
