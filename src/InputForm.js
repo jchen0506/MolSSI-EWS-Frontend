@@ -5,7 +5,11 @@ import TextField from '@mui/material/TextField';
 import BSESelector from './BSESelector';
 import MethodSelector from './MethodSelector';
 import Button from '@mui/material/Button';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import { useState } from 'react';
 
 const VisuallyHiddenInput = styled('input')({
@@ -119,12 +123,25 @@ export default function FormPropsTextFields({ onPostSuccess }) {
 					variant="standard"
 					onChange={handleReferenceChange}
 				/>
-				<TextField
+				<FormControl>
+					<FormLabel id="freeze-core">Freeze Core</FormLabel>
+					<RadioGroup
+						aria-labelledby="demo-radio-buttons-group-label"
+						defaultValue="true"
+						name="radio-buttons-group"
+						onChange={handleFreezeCoreChange}
+					>
+						<FormControlLabel value="True" control={<Radio />} label="True" checked={freeze_core === 'True'} />
+						<FormControlLabel value="False" control={<Radio />} label="False"
+							checked={freeze_core === 'False'} />
+					</RadioGroup>
+				</FormControl>
+				{/* <TextField
 					id="freeze_core"
 					label="Set freeze_core"
 					variant="standard"
 					onChange={handleFreezeCoreChange}
-				/>
+				/> */}
 				<MethodSelector onChange={handleMethodChange} />
 				<br />
 				<Button
