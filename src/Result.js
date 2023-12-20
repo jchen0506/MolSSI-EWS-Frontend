@@ -21,7 +21,7 @@ export default function Result() {
 
 	return (
 		<div>
-			{result ? (
+			{Object.keys(result).length !== 0 ? (
 				<div>
 					<ul id="result-list">
 						<li>Final Energy: {result.final_energy}</li>

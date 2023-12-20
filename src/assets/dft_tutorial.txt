@@ -1,0 +1,1065 @@
+Density Functional Theory
+
+What’s The Point of Density Functional Theory?
+In previous lessons, we’ve covered the fundamental limitations of Hartree-Fock theory, as well as some of the ways that various post-HF theories systematically improve upon it.  As we’ve seen, post-HF theories tend to be extremely computationally demanding, and it takes serious effort to apply them to systems with more than a few dozen atoms.
+Density Functional Theory (DFT) takes a very different approach to the simulation of quantum properties, with its own set of advantages and disadvantages.  We’ll talk more about the theory later, but the basic concept is this: instead of trying to systematically improve on mean-field HF theory by calculating specific components of the electron correlation, DFT attempts to approximate the electron correlation with so-called “density functionals”.  These are relatively simple mathematical expressions that are relatively easy to evaluate on a computer.  In most cases, density functionals aren’t derived directly from approximations to the laws of quantum mechanics - unlike post-HF methods, they are not generally ab initio.  In simplified terms, you can think of “density functionals” as being mathematical equations that perform highly sophisticated guesstimations at a low computational cost.
+Density functionals often include parameters that are fitted to experimental or post-HF results, in a somewhat similar manner to the way that parameters in empirical molecular mechanics force fields are fitted.  For this reason, it’s not possible to say that one DFT functional is strictly “better” than another.  In the case of post-HF theories, it is a simple matter to construct a hierarchy of methods: for example, full CI is better than CCSD(T), which is better than CCSD, which is better than HF.  With DFT, the situation is blurrier: functionals that perform fantastically for certain types of chemical systems might do very poorly for others.
+By the end of this lesson, you’ll learn more about the theory behind DFT, the advantages and disadvantages it offers, and the types of functionals that are likely to be suitable for different types of simulations.
+
+Example 1: DFT for Diatomics
+Before we think more deeply about the theory of DFT, let’s play around with some simple DFT calculations.
+When running DFT calculations, one of the first things you’ll need to realize is that there is a vast number of different density functionals, with helpful and intuitive names like PBE, PBE0, mPW1K, B3LYP, M06, M06-D3, ⍵B97X-D, B2GPPLYP, and many more.  This eclectic collection has been described as an “alphabet soup” by more than one researcher, and it’s one of the most intimidating points of confusion for people who want to use DFT for the purpose of simulating chemical systems.
+Is there any consistent pattern to the seemingly random groupings of letters and numbers?  The answer is a definite no.  Sometimes a letter stands for one of the people who created the functional.  Other times it stands for the location where the functional was developed.  A third case is when it means something about the actual mathematical form of the functional.  The numbers also don’t have a single origin.: Sometimes the numbers express something about the mathematical form of the functional, and other times they simply represent the year the functional was developed.
+It’s easy to be overwhelmed by the challenge of selecting a functional to use.  Fortunately, density functionals tend to fall into one of several broad categories, and you can usually use these categories as a rough starting point.  We’ll talk more about these categories later, but for this example, we’ll run some tests using three popular functionals: PBE, B3LYP, and M06.
+We’ll run the tests on a familiar set of diatomic molecules: H2, HF, and HCl.  You’ve previously computed the bond energies and bond lengths for these molecules using the HF and CCSD(T) methods, and these values are reproduced in the table below.
+Now, compute the bond energies and bond lengths using the PBE, B3LYP, and M06 functionals.  Running a DFT calculation works almost exactly like running a HF calculation, except that the “Method” you select should be the DFT functional you want to use (i.e., PBE, B3LYP, or M06).  Add the results to the table.
+
+
+Example Input File #1: M06 for HCl
+
+molecule {
+  0 1
+    H 0.0 0.0 0.0
+    Cl 1.0 0.0 0.0
+}
+
+set basis aug-cc-pVDZ
+
+set reference rks
+set freeze_core True
+
+optimize('M06')
+
+
+
+
+Example Input File #2: MP2 for HCl
+
+molecule {
+  0 1
+    H 0.0 0.0 0.0
+    Cl 1.0 0.0 0.0
+}
+
+set basis aug-cc-pVDZ
+
+set reference rhf
+set freeze_core True
+
+optimize('MP2')
+
+Example Input File #3: HF for H
+molecule {
+  0 2
+    H 0.0 0.0 0.0
+}
+
+set basis aug-cc-pVDZ
+
+set reference uhf
+set freeze_core True
+
+energy('HF')
+
+Results
+
+
+
+CCSD(T)
+HF
+MP2
+PBE
+B3LYP
+M06
+H
+-0.499334315439586
+-0.499334315439586
+-0.499334315439586
+-0.499225147772742
+-0.501657882045278
+-0.498143849685059
+H
+-0.499334315439586
+-0.499334315439586
+-0.499334315439586
+-0.499225147772742
+-0.501657882045278
+-0.498143849685059
+H2
+-1.16489937
+-1.12882654
+-1.1562091
+-1.16092253
+-1.17402629
+-1.16695415
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+au
+-0.166230739120828
+-0.130157909120828
+-0.157540469120828
+-0.162472234454516
+-0.170710525909444
+-0.170666450629882
+kcal/mol
+-104.311385948347
+-81.6753385344922
+-98.8581580269664
+-101.952888158408
+-107.122495200132
+-107.09483753873
+kj/mol
+-436.730702065765
+-341.958144025535
+-413.899138310987
+-426.856148235846
+-448.50024865892
+-448.384451617479
+
+
+
+
+94.7725580402305
+22.8315637547786
+9.87455382991919
+-11.769546593155
+-11.6537495517135
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bond Length
+0.76211425648
+0.748276562892
+0.755128598038
+0.768178602072
+0.761064988462
+0.757692083292
+Length Error
+
+
+-0.013837693588
+-0.006985658442
+0.006064345592
+-0.001049268018
+-0.004422173188
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CCSD(T)
+HF
+MP2
+PBE
+B3LYP
+M06
+H
+-0.499334315439586
+-0.499334315439586
+-0.499334315439586
+-0.499225147772742
+-0.501657882045278
+-0.498143849685059
+F
+-99.5500694612055
+-99.3810983745063
+-99.5325663984612
+-99.6392800062527
+-99.73951756523
+-99.7060811875667
+HF
+-100.26364113
+-100.03380632
+-100.25578584
+-100.36271749
+-100.46078807
+-100.42933826
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+au
+-0.214237353354915
+-0.153373630054116
+-0.223885126099216
+-0.224212335974548
+-0.219612622724726
+-0.22511322274824
+kcal/mol
+-134.435997629254
+-96.2434264774877
+-140.490067722399
+-140.695395063012
+-137.809030804563
+-141.260710169251
+kj/mol
+-562.856366002166
+-402.951785489093
+-588.203534560005
+-589.063198659029
+-576.978574554484
+-591.430058815202
+
+
+
+
+159.904580513073
+-25.3471685578392
+-26.2068326568634
+-14.1222085523184
+-28.573692813036
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bond Length
+0.923950982824
+0.900340751725
+0.924679431641
+0.933968794128
+0.925568726807
+0.918338021643
+
+
+
+
+-0.023610231099
+0.000728448817
+0.010017811304
+0.001617743983
+-0.005612961181
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CCSD(T)
+HF
+MP2
+PBE
+B3LYP
+M06
+H
+-0.499334315439586
+-0.499334315439586
+-0.499334315439586
+-0.499225147772742
+-0.501657882045278
+-0.498143849685059
+Cl
+-459.609931089168
+-459.47278229267
+-459.592144154451
+-459.952206689968
+-460.161485956314
+-460.126428258064
+HCl
+-460.27230226
+-460.09259017
+-460.25177151
+-460.61878758
+-460.82771784
+-460.793591637278
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+au
+-0.163036855392403
+-0.120473561890418
+-0.160293040109462
+-0.167355742259238
+-0.164574001640731
+-0.169019529528944
+kcal/mol
+-102.307193221827
+-75.5983175999055
+-100.585422769121
+-105.017336226764
+-103.271767261602
+-106.061378724223
+kj/mol
+-428.339551966759
+-316.514884930649
+-421.13084687891
+-439.686373279541
+-432.378028627339
+-444.057568319818
+
+
+
+
+111.82466703611
+7.20870508784981
+-11.3468213127818
+-4.03847666057953
+-15.718016353059
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bond Length
+1.291972727458
+1.276814604888
+1.287841665946
+1.301249540975
+1.294710648928
+1.29478096143
+
+
+
+
+-0.01515812257
+-0.004131061512
+0.009276813517
+0.00273792147
+0.002808233972
+
+
+
+
+Text For Post-Completion:
+How did DFT do, compared to your previous results?  All of the functionals did considerably better than HF, and they generally did roughly as well as MP2 (and sometimes even better).  This trend is true of both the binding energies and the bond lengths.
+If you were to repeat these tests for other types of systems (e.g., small organic molecules, transition metal complexes, solid materials, polypeptides, etc.) you would often find roughly the same thing: DFT is usually (but not always) a big improvement over HF, and is often competitive with some post-HF methods.  There are some important caveats, however: some DFT functionals struggle with certain types of systems, and some DFT functionals are generally more reliable than others.  We’ll talk more about this nuance later on.
+
+The Hohenberg-Kohn Theorem
+One of the key moments in the history of DFT is the discovery of the first “Hohenberg-Kohn Theorem” in 1964.  In slightly simplified terms, this is a mathematical proof that there is a one-to-one relationship between the external potential of a system—which in chemical contexts is usually composed of the sum of the nuclear Coulomb potentials  of the nuclei composing your molecular system—and the ground-state electronic density of that system. (In some types of calculations, the external potential can also include more terms, such as an external electromagnetic field. However, for the purposes of this lesson, we don’t need to worry about this nuance, and will just treat the “external potential” as being the same as the “nuclear potential”.)
+The result of the Hohenberg-Kohn theorem is therefore the following: a particular arrangement of atomic nuclei in a molecular system will result in a specific ground-state electronic density that no other arrangement of atomic nuclei will produce (not counting indistinguishable changes, like swapping the position of identical nuclei, such as two hydrogens). This shouldn’t be too surprising: you probably never really expected that two different molecules, with different atomic nuclei in different locations, would ever have exactly the same electron density.  It would therefore be very strange if, for example, you could replace a hydrogen nucleus with a lithium nucleus without changing the distribution of the electrons within the system.
+[Insert self assessment: show the electron density distribution for several molecules, and ask students to guess which (of a set of options) nuclear configuration created that density distribution]
+The Hohenberg-Kohn theorem simply tells us that for any specific distribution of the electron density, there is exactly one external potential that could produce that density:
+
+Even if the Hohenberg-Kohn theorem isn’t very surprising, it does have some important implications regarding the way we can think about how quantum chemistry calculations work.  Normally, we start our calculations with a specific external potential (that is, a specific arrangement of atomic nuclei) and then try to figure out what the converged, ground state electronic density is that would correspond to that potential.  The Hohenberg-Kohn theorem tells us that, at least in principle, this process can also go the other way: if someone gives you the converged electron density of a system, you should be able to figure out the external potential that created that specific distribution of electron density.
+Figuring out how to calculate the external potential from the electron density is another matter entirely (you might also be wondering why you would ever want to do such a calculation - we’ll get to that later).  As a general rule, solving “inverse problems” - that is, problems where you try to calculate causes (such as the external potential) from their observable effects (such as the electron density distribution) - are a computational nightmare.  It’s almost always easier to start with a cause and calculate an effect.  That having been said, I can give you a conceptually straightforward way to calculate the external potential from the electron density:
+Construct a list of every possible configuration of atomic nuclei.  Yes, this list will be infinitely large and include every possible geometry of every possible molecule.
+For every entry in the list, run a highly accurate quantum calculation to compute the electron density from the external potential.  Ideally, these should be full CI calculations in an infinite basis set.  Record the electron densities you compute.
+Find the entry in this list that has the electron density you were given.  The external potential that was used to compute that electron density is the answer you were looking for.  Ta-da!
+Sure, the process above requires an infinite number of infinitely expensive calculations that require an infinite amount of storage space, but the point is that it is correct.  I never said it would be practical.  Perhaps you think you know a better way.  Maybe you do.  Regardless, we can most certainly say that there is at least one process for which the following is true:
+
+If we know the external potential, what else can we calculate?  The answer is everything, of course!  All you need to do is run a traditional quantum calculation, starting with the external potential, and then you can calculate whatever you like: the total energy, the kinetic energy, the wavefunction, the Hamiltonian, etc.  This means that even if all we start with is the electron density, we can calculate any property of the system:
+
+Or, we could simply say:
+
+The little diagram above is the origin of the term “Density Functional Theory”.  A function is just a mathematical structure that can convert one or more inputs into an output.  The electron density distribution is a function of position: at every point in space, the electron density distribution has a different value.  You can imagine the electron density distribution as just being an infinite list containing the value of the electron density at every point in space.  Give the electron density distribution a position, and it can give you the value of the electron density at that position:
+
+A functional is a function of a function (technically, the word “functional” can mean several different things - this is simply how DFT researchers tend to use the word).  We’ve learned that external potentials can be expressed as a functional of the electron density distribution: you can imagine an infinite list that contains the external potential corresponding to every possible electron density distribution.
+
+The same thing is true of every other property of a molecular system.  The energy is a functional of the electron density distribution.  The wavefunction is a functional of the density distribution.  The vibrational frequencies are a functional of the density distribution.  One way or another, everything can somehow be represented as a functional of the electron density distribution.
+
+Making this Useful
+Based on what we’ve talked about so far, DFT probably doesn’t sound very useful.  When would you ever know the electron density distribution of a molecular system, but not the position of the nuclei (and thus the external potential)?
+Probably never.  What makes DFT interesting is that it suggests the possibility of a different approach to quantum computation.  In previous lessons, we’ve described HF and post-HF methods that are primarily based around evaluation of the wavefunction: you start with the external potential and a guess for the wavefunction, and then iteratively update the Hamiltonian and the wavefunction until they converge to self-consistency.  Could we do something similar, except using the electron density distribution instead of the wavefunction?  Could we start with the external potential and a guess for the electron density distribution, and then perform some sort of iterative process in which we converge the electron density distribution to a self-consistent value?
+It turns out that there absolutely is a DFT analogue to the sort of self-consistent convergence that is performed in HF and post-HF theories.  In the case of DFT, the self-consistent process requires representing specific potential terms - specifically potential terms that include the interactions between electrons - as functionals of the density.  Somewhat ironically, since we already know the external potential, we actually don’t need to represent it as a functional of the density.  Adding the external potential and the potential associated with interactions between the electrons yields the total potential felt by the electron density distribution, which plays a similar role to that of the Hamiltonian in wavefunction-based calculations.  By iteratively updating the potential terms and the electron density distribution, you can reach self-convergence using DFT.
+Of course, to do this in a practical context, you could never follow the outrageously costly approach to evaluating functionals of the density that I outlined in the previous section.  Instead, practitioners of DFT have developed numerous density functionals that are intended to mimic the results of the actual functionals, but with a minimum amount of computational effort.  We’ll talk about these approximate functionals in more detail later on.  For now, just understand that the functionals people use for real-world DFT calculations are imperfect, but also far cheaper to evaluate than the Hamiltonian in most post-HF methods.
+People will often say things like “the Hohenberg-Kohn theorem tells us that there is an exact functional for performing quantum calculations, and all we need to do is discover it!”  This is completely false; we’ve already talked about an exact functional in the previous section.  The problem isn’t that we don’t know the exact DFT functionals, it’s that we don’t like the exact DFT functionals - we’re forced to use approximate functionals out of practical necessity, not ignorance.  Nothing about the Hohenberg-Kohn theorem promises that there is a convenient, easily evaluated functional expression for computing exact molecular properties.  DFT is not a “free lunch”; it’s just a different way of trying to approximate solutions to extremely complex problems.
+
+Example 2: Self-Interaction Error
+One of the unfortunate consequences of using approximate functionals is the problem of self-interation error (SIE), which means that electrons interact with themselves in unphysical ways [https://pubs.acs.org/doi/10.1021/acs.jpclett.8b00242, https://wires.onlinelibrary.wiley.com/doi/10.1002/wcms.1631#wcms1631-bib-0119].
+That might sound peculiar, but it’s actually a fairly simple concept.  Think about it this way: DFT functionals rely on using the total electron density distribution to compute all interactions between electrons.  Of course, an individual electron doesn’t directly interact with the entire distribution of all the electrons, even within the context of mean-field theory: it only interacts with the distribution of all the other electrons.  It’s very challenging for DFT functionals to fully account for this distinction without introducing a significant amount of computational complexity.  Practical DFT functionals have the unfortunate side-effect of causing electrons to interact with themselves - and the results can sometimes be bizarre.
+One specific place where SIE is especially conspicuous is the humble hydrogen atom. There is only one electron in this system, so there isn’t any interaction between electrons whatsoever.  As we’ve previously seen, even simple HF theory is exact for the hydrogen atom.
+Approximate DFT functionals suffer from SIE, and thus don’t produce exact results for the hydrogen atom.  Let’s investigate this with a few simple tests.  First, compute the ground state energy of the hydrogen atom using HF theory, as well as the PBE, B3LYP, and M06 functionals, and place the results in the table below.
+Then, compute the binding energy of H2+ using the same set of methods.  Once again, this system only has a single electron, so HF theory is exact.  Place the results in the table below.
+
+Example Input File #1: HF on H2+:
+
+molecule hydrogen {
+  1 2
+    H           0.0     0.0    0.0
+    H           1.0     0.0    0.0
+}
+
+set basis aug-pcseg-4
+
+set reference uhf
+set freeze_core True
+
+optimize('HF')
+
+Example Input File #2: PBE on H2+:
+
+molecule hydrogen {
+  1 2
+    H           0.0     0.0    0.0
+    H           1.0     0.0    0.0
+}
+
+set basis aug-pcseg-4
+
+set reference uks
+set freeze_core True
+
+optimize('PBE')
+
+
+
+Results:
+
+
+Hydrogen Atom
+Exact
+HF
+PBE
+B3LYP
+M06
+Energy (Eh)
+-0.5
+-0.49999854886696
+-0.499990207240021
+0.497556728871164
+-0.500183928481793
+Error (kJ/mol)
+
+
+0.003812497945361
+0.025728087135987
+2620.83687321911
+-0.483227202190213
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+H2+
+Exact
+HF
+PBE
+B3LYP
+M06
+Energy (Eh)
+N/A
+-0.60262999
+-0.61005711
+0.38938565
+-0.60813757
+Binding Energy (kJ/mol)
+
+
+-269.639066619766
+-289.17392758285
+-284.193112949322
+-283.621849365255
+
+
+
+[WIP: ADD SOME TEXT FOR POST-COMPLETION]
+
+
+Orbital-Free Density Functional Theory
+The idea that maybe we can run quantum calculations where we primarily work with the electron density, rather than than the wavefunction, was quite exciting to many theorists.  As we’ve seen in previous lessons, wavefunctions can be complicated, finicky, many-dimensional monstrosities.  By comparison, the electron density distribution seems downright simple: it’s just a set of values in plain, boring, three dimensional space.  Could we somehow escape the tyranny of the wavefunction, and only work with the electron density distribution?
+The Wavefunction
+
+
+Doug Keenan, GPL http://www.gnu.org/licenses/gpl.html, via Wikimedia Commons
+The Electron Density Distribution
+
+
+Jud McCranie, CC BY 3.0 https://creativecommons.org/licenses/by/3.0, via Wikimedia Commons
+
+
+This idea is today known as orbital-free DFT.  Llewellyn Thomas and Enrico Fermi were apparently so excited about it that they got started in 1927 - decades before the Hohenberg-Kohn theorems!  In what some characterize as the true beginning of DFT, they were able to derive a simple, easily evaluated approximation of the energy functional.  Unfortunately, the approximations of Thomas and Fermi turn out to be highly inaccurate for most chemical systems.  Notably, the Thomas-Fermi model is completely unable to simulate chemical bonding!
+It turns out that it is extraordinarily difficult (impossible?) to construct an easily evaluated functional that accurately approximates the complete energy of a quantum system.  After nearly a century of development, our functionals still aren’t good enough that we can reliably simulate chemical systems without using wavefunctions.
+Apparently, we’re going to be stuck with wavefunctions for the foreseeable future.
+
+Kohn-Sham Theory
+In 1965, Walter Kohn and Lu Jeu Sham introduced an idea that would finally raise DFT to a position of prominence, and would eventually win them both the Nobel Prize.
+It turns out that the hardest part of constructing an accurate energy functional comes down to representing one specific component of the energy: specifically, the kinetic energy. This has always been the true bane of orbital-free DFT.  Meanwhile, simple, fast, wavefunction-based HF calculations can compute the kinetic energy just fine (at least within the context of the mean-field approximation).
+Sham’s idea was basically this: could we somehow develop a method that computes the kinetic energy in a similar manner to HF theory, but computes all the other energy terms using functionals?  The method he produced is today known as Kohn-Sham DFT (KS-DFT), and it looks an awful lot like HF theory, but with a couple key differences:
+It uses a “correlation functional” to approximately account for all the correlation interactions HF theory ignores.
+It handles something called “exchange” differently.  It’s common for people to say that HF theory doesn’t include correlation interactions, but that’s not really true.  It is more accurate to say that HF theory doesn’t include one particular type of correlation - specifically, the sort of correlation that arises from electrons constantly moving to avoid the negative charges of the other electrons.  There is actually another type of correlation, which is even more important: “Fermi correlation” (more commonly known as “exchange”), which accounts for the fact that two electrons can’t simultaneously be in the same quantum state.  HF and post-HF theories handle exchange exactly.  KS-DFT does not - instead, it uses an approximate “exchange functional”.  Sort of.  There’s some more nuance here that we’ll talk about later.
+Together, the “exchange functional” and the “correlation functional” are called the “exchange-correlation functional”.  Developing a good exchange-correlation functional is hard, but not nearly as hard as developing a good functional that computes the entire kinetic energy (of which correlation is merely a small component).  A tremendous amount of research has gone into the development of better exchange-correlation functionals, and KS-DFT calculations can often obtain results that are competitive with expensive post-HF methods, at a fraction of the cost.
+It’s unfortunate that KS-DFT is forced to sacrifice the no-wavefunction dream of orbital-free DFT, but there’s no denying its success.  KS-DFT is so ubiquitous that when people say “DFT”, they are almost always talking about KS-DFT.
+
+
+
+Types of Functionals
+As we’ve seen, there are a painfully large number of exchange-correlation functionals, and it’s not entirely obvious which one you should use.  Fortunately, there are a few broad categories that are typically used to classify functionals.  If you know about those categories, it becomes much easier to make an informed selection.
+These categories roughly correspond to different levels of accuracy - with a strong emphasis on the word “rough”.  Unlike post-HF methods, there isn’t a strict hierarchy within DFT; because many functionals include empirical parameters, it’s entirely possible for a functional to be good for one type of system and terrible for others.  Nonetheless, there is a loose sense in which you can rank different types of functionals [https://dft.uci.edu/pubs/RCFB08.pdf].  From least accurate to most accurate, the main categories of DFT functionals include:
+
+Local Functionals
+Local functionals, also known as local density approximation (LDA) functionals, attempt to approximate the exchange-correlation functional at each particular point in space using a mathematical formula that only uses the electron density at that particular point in space, while ignoring it everywhere else.  As you might guess, this approach misses out on the complexity of how electrons interact with one another at finite distances - which is obviously quite relevant when trying to study interactions between atoms and molecules.
+These sorts of functionals aren’t good enough for most real-world applications, and aren’t often used in practical calculations.  Incidentally, the Thomas-Fermi kinetic energy functional (which, as we’ve discussed, isn’t able to represent chemical bonds) is a local functional.
+
+Semi-Local Functionals
+Semi-local functionals, also known as generalized gradient approximation (GGA) functionals, calculate the exchange-correlation potential at each point by using both the density at that point and the gradient (that is, slope) of the density at that point.  This means that they implicitly use a little bit of information about the density at nearby points in space - hence the name “semi-local”.
+GGA functionals can do significantly better than LDA functionals, and they’ve found plenty of use in practical applications - most notably in plane-wave DFT calculations on condensed-phase materials.  Gaussian-based calculations (such as those we’ve been doing throughout this course) don’t typically use GGA functionals, as more accurate types of functionals are available.
+The most popular GGA functionals include PBE and BLYP.  BLYP was published in 1988 [https://journals.aps.org/prb/abstract/10.1103/PhysRevB.37.785], and has been cited more than 70,000 times.  A report from Nature in 2014 [https://www.nature.com/news/the-top-100-papers-1.16224] found that it was the 7th most cited paper in all of science.
+
+Hybrid Functionals
+Remember how we talked about the fact that KS-DFT doesn’t calculate exchange the same way as HF theory?  Remember when I said we’d come back to that point?  We’re coming back to that point now.
+Hybrid functionals say: “Look! HF theory has a way of calculating exchange exactly.  Why don’t we do that, instead of using an approximate functional?”  Perhaps you’ve already wondered about this yourself - it seems like an obvious way to avoid an unnecessary approximation.
+Unfortunately, this idea doesn’t work quite as smoothly as you might assume.  If you simply replace the exchange functional with exact HF exchange, and then run KS-DFT using only a correlation functional, you tend to get terrible results.  It turns out that using both an approximate exchange functional and an approximate correlation functional often leads to the most wonderful phenomenon in all of computation: cancellation of error [https://pubs.acs.org/doi/10.1021/acs.jpca.0c04156].  Replacing approximate exchange with exact exchange can easily make a calculation worse, because it’s extremely difficult to make a correlation functional that is good enough to work alongside exact HF exchange.
+For this reason, hybrid functionals take an intermediate approach: they replace a fraction of the approximate exchange functional with a corresponding fraction of exact exchange.  Different hybrid functionals use different fractions of exact exchange, but it’s often in the range of 20-60%.
+By far, hybrid functionals are the most widely used functionals in Guassian-based DFT calculations.  The most famous hybrid functional is B3LYP, which has historically served as a sort of “default” functional in the eyes of many researchers - in fact, some people running B3LYP calculations have probably never considered any other options!  The B3LYP functional was published in 1993 [https://pubs.aip.org/aip/jcp/article/98/7/5648/842114/Density-functional-thermochemistry-III-The-role-of], and it has been cited more than 70,000 times.  A report from Nature in 2014 [https://www.nature.com/news/the-top-100-papers-1.16224] found that it was the 8th most cited paper in all of science.
+B3LYP is a genuinely good functional, but there’s been plenty of progress in functional development in the last several decades.  If you’re planning on running some DFT calculations, it’s worth taking some time to investigate whether there are newer functionals that might be better suited for your use case.
+Other popular hybrid functionals include PBE0 [https://pubs.aip.org/aip/jcp/article/105/22/9982/478038/Rationale-for-mixing-exact-exchange-with-density, https://pubs.aip.org/aip/jcp/article/110/13/6158/476177/Toward-reliable-density-functional-methods-without], HSE [https://pubs.aip.org/aip/jcp/article/118/18/8207/460359/Hybrid-functionals-based-on-a-screened-Coulomb], and the Minnesota functionals (including M05 [https://pubs.aip.org/aip/jcp/article/123/16/161103/907466/Exchange-correlation-functional-with-broad], M06 [https://link.springer.com/article/10.1007/s00214-007-0310-x], M08-HX [https://pubs.acs.org/doi/10.1021/ct800246v], etc.)
+
+Random Phase Approximation
+Although most modern Gaussian-based DFT calculations use hybrid functionals, researchers continue to develop more sophisticated functionals.  This often involves incorporating information about the unoccupied KS-DFT orbitals in order to evaluate certain correlation terms.  If you think that sounds somewhat similar to what post-HF methods do, you’re not wrong [https://www.frontiersin.org/articles/10.3389/fmats.2019.00123/full].
+In particular, a method known as the “random phase approximation” offers a useful way of accurately accounting for certain correlation interactions within the context of KS-DFT, albeit at significant computational cost [https://www.cond-mat.de/events/correl19/manuscripts/ren.pdf].  Although promising, RPA and similar methods remain specialized tools, and you probably shouldn’t try to use them unless you really know what you’re doing.
+
+Where is this going?
+As you might have noticed, the more advanced our DFT functionals become, the less they look like simple functionals of the density à la orbital-free DFT.  KS-DFT calculations with hybrid functionals basically look like HF calculations, with some extra terms thrown in.  Meanwhile, DFT calculations with RPA can be formulated in a way that looks remarkably similar to coupled-cluster calculations.
+The longer DFT develops, the more it seems to look like WFT.  Perhaps we shouldn’t be too surprised by this.  There are no free lunches: methods that are very good at accomplishing a particular task are likely to look at least vaguely similar to other viable methods.
+Discussions between DFT and WFT researchers can easily devolve into arguments over the respective merits of each approach, with all the dogmatic confidence of a conflict between the fans of rival sports teams.  Don’t take conversations such as these too seriously: at the end of the day, DFT and WFT really aren’t so terribly different.
+
+
+Example 3: The Benzene Dimer
+
+Let’s try a particularly difficult problem, which will really put DFT to the test.  The benzene dimer is a challenging system to study that has been the subject of numerous computational and experimental studies. [https://pubs.acs.org/doi/full/10.1021/jp800107z; https://pubs.acs.org/doi/10.1021/ja049434a; https://pubs.acs.org/doi/10.1021/ja025896h, https://pubs.acs.org/doi/10.1021/jp961239y]
+There are a few different types of interactions that are relevant for accurate simulation of this system: most notably, mutual polarization of the benzene molecules, and interactions between the 𝛑 orbitals of the aromatic rings.  There isn’t much room for error: the dimer has a very small binding energy of only about 2-3 kcal/mol, so small errors can have a big impact on qualitative predictions.
+We’ll go ahead and test how DFT performs for this system, using the PBE, B3LYP, and M06 functionals.  As with any calculation involving non-covalent binding energies, you’ll need to do a Counterpoise correction.  Recall that this requires doing calculations on each of the individual molecules in the dimer, both with and without ghost atoms.
+Provided below are MP2/aug-cc-pVDZ optimized geometries, for both a benzene monomer and for a benzene dimer.  There are actually multiple possible configurations for the benzene dimer; we’ll be doing calculations on something called the “T-shaped” configuration.  Use the MP2/aug-cc-pVDZ optimized geometries for all of your calculations.
+Record your results in the table below.
+
+
+
+NOTE: NEED TO CREATE OUR OWN IMAGE ABOVE
+
+Here is the optimized, MP2/aug-cc-pVDZ geometry of a single benzene molecule:
+    C           -0.000000000000     1.407916777728     0.000000000000
+    C            0.000000000000    -1.407916777728     0.000000000000
+    C            1.219284868697     0.703956110060     0.000000000000
+    C           -1.219284868697    -0.703956110060     0.000000000000
+    C           -1.219284868697     0.703956110060     0.000000000000
+    C            1.219284868697    -0.703956110060     0.000000000000
+    H           -0.000000000000     2.502066872817     0.000000000000
+    H            0.000000000000    -2.502066872817     0.000000000000
+    H            2.166852596434     1.251022351922     0.000000000000
+    H           -2.166852596434    -1.251022351922     0.000000000000
+    H           -2.166852596434     1.251022351922     0.000000000000
+    H            2.166852596434    -1.251022351922     0.000000000000
+
+
+Here is the optimized, MP2/aug-cc-pVDZ geometry of the benzene dimer in a T-shaped configuration:
+    C           -0.327708761797     1.268942240151    -2.625322917304
+    C            0.342403561708    -1.409795784232    -2.068453438955
+    C            1.024611708935     0.881283771899    -2.554012055608
+    C           -1.009746494697    -1.022936588037    -2.142774451873
+    C           -1.345166158970     0.316957620001    -2.418064323014
+    C            1.359430366290    -0.457740997695    -2.273435363990
+    H           -0.588250242879     2.310107434746    -2.836905363163
+    H            0.603627669837    -2.448832034171    -1.847167142190
+    H            1.814883548124     1.621142477674    -2.711792527507
+    H           -1.800578357920    -1.762307339520    -1.984172694331
+    H           -2.395216456279     0.619133369126    -2.468596982395
+    H            2.409509829243    -0.757236107899    -2.209980462856
+    C           -0.016176076182    -0.189155962542     3.731381782969
+    C            0.001599626245     0.330326646628     0.960895745351
+    C            0.554405965682     1.001550732147     3.241607951242
+    C           -0.567899055972    -0.859407548181     1.452902873009
+    C           -0.578607228823    -1.120119309793     2.836577775660
+    C            0.562525813715     1.259884290009     1.857159508103
+    H           -0.022833123124    -0.390484042539     4.806958122821
+    H            0.009638951897     0.526143555049    -0.113092209897
+    H            0.991245944921     1.724550540417     3.937315255563
+    H           -1.001958610304    -1.579342717724     0.752869494894
+    H           -1.022115876406    -2.045053125969     3.217812252282
+    H            1.005937087036     2.184689017671     1.475052033356
+
+
+
+Example Input File #1: MP2 on a Benzene Dimer:
+
+molecule benzene {
+  0 1
+    C           -0.327708761797     1.268942240151    -2.625322917304
+    C            0.342403561708    -1.409795784232    -2.068453438955
+    C            1.024611708935     0.881283771899    -2.554012055608
+    C           -1.009746494697    -1.022936588037    -2.142774451873
+    C           -1.345166158970     0.316957620001    -2.418064323014
+    C            1.359430366290    -0.457740997695    -2.273435363990
+    H           -0.588250242879     2.310107434746    -2.836905363163
+    H            0.603627669837    -2.448832034171    -1.847167142190
+    H            1.814883548124     1.621142477674    -2.711792527507
+    H           -1.800578357920    -1.762307339520    -1.984172694331
+    H           -2.395216456279     0.619133369126    -2.468596982395
+    H            2.409509829243    -0.757236107899    -2.209980462856
+    C           -0.016176076182    -0.189155962542     3.731381782969
+    C            0.001599626245     0.330326646628     0.960895745351
+    C            0.554405965682     1.001550732147     3.241607951242
+    C           -0.567899055972    -0.859407548181     1.452902873009
+    C           -0.578607228823    -1.120119309793     2.836577775660
+    C            0.562525813715     1.259884290009     1.857159508103
+    H           -0.022833123124    -0.390484042539     4.806958122821
+    H            0.009638951897     0.526143555049    -0.113092209897
+    H            0.991245944921     1.724550540417     3.937315255563
+    H           -1.001958610304    -1.579342717724     0.752869494894
+    H           -1.022115876406    -2.045053125969     3.217812252282
+    H            1.005937087036     2.184689017671     1.475052033356
+}
+
+set basis aug-cc-pVDZ
+
+set reference rhf
+set freeze_core True
+
+energy('MP2')
+
+
+Example Input File #2: B3LYP on a Benzene Dimer, with the second molecule as ghost atoms:
+
+molecule benzene {
+  0 1
+    C           -0.327708761797     1.268942240151    -2.625322917304
+    C            0.342403561708    -1.409795784232    -2.068453438955
+    C            1.024611708935     0.881283771899    -2.554012055608
+    C           -1.009746494697    -1.022936588037    -2.142774451873
+    C           -1.345166158970     0.316957620001    -2.418064323014
+    C            1.359430366290    -0.457740997695    -2.273435363990
+    H           -0.588250242879     2.310107434746    -2.836905363163
+    H            0.603627669837    -2.448832034171    -1.847167142190
+    H            1.814883548124     1.621142477674    -2.711792527507
+    H           -1.800578357920    -1.762307339520    -1.984172694331
+    H           -2.395216456279     0.619133369126    -2.468596982395
+    H            2.409509829243    -0.757236107899    -2.209980462856
+   @C           -0.016176076182    -0.189155962542     3.731381782969
+   @C            0.001599626245     0.330326646628     0.960895745351
+   @C            0.554405965682     1.001550732147     3.241607951242
+   @C           -0.567899055972    -0.859407548181     1.452902873009
+   @C           -0.578607228823    -1.120119309793     2.836577775660
+   @C            0.562525813715     1.259884290009     1.857159508103
+   @H           -0.022833123124    -0.390484042539     4.806958122821
+   @H            0.009638951897     0.526143555049    -0.113092209897
+   @H            0.991245944921     1.724550540417     3.937315255563
+   @H           -1.001958610304    -1.579342717724     0.752869494894
+   @H           -1.022115876406    -2.045053125969     3.217812252282
+   @H            1.005937087036     2.184689017671     1.475052033356
+}
+
+set basis aug-cc-pVDZ
+
+set reference rks
+set freeze_core True
+
+energy('B3LYP')
+
+Example Input File #3: M06 on the converged geometry of the second molecule in the benzene dimer:
+
+molecule benzene {
+  0 1
+    C           -0.016176076182    -0.189155962542     3.731381782969
+    C            0.001599626245     0.330326646628     0.960895745351
+    C            0.554405965682     1.001550732147     3.241607951242
+    C           -0.567899055972    -0.859407548181     1.452902873009
+    C           -0.578607228823    -1.120119309793     2.836577775660
+    C            0.562525813715     1.259884290009     1.857159508103
+    H           -0.022833123124    -0.390484042539     4.806958122821
+    H            0.009638951897     0.526143555049    -0.113092209897
+    H            0.991245944921     1.724550540417     3.937315255563
+    H           -1.001958610304    -1.579342717724     0.752869494894
+    H           -1.022115876406    -2.045053125969     3.217812252282
+    H            1.005937087036     2.184689017671     1.475052033356
+}
+
+set basis aug-cc-pVDZ
+
+set reference rks
+set freeze_core True
+
+energy('M06')
+
+Results:
+
+
+
+
+MP2
+PBE/MP2
+B3LYP/MP2
+M06/MP2
+Benzene
+-231.539651232465
+-231.963094692275
+-232.274127792795
+-232.070877926065
+Benzene Dimer
+-463.090503227232
+-463.926364111356
+-464.545986964246
+-464.145353764259
+Counter-poise (Molecule 1 only)
+-231.539643597886
+-231.963058197274
+-232.274071801877
+-232.070752352664
+Counter-poise (Molecule 2 only)
+-231.539633076929
+-231.963063132616
+-232.274090555968
+-232.070725607603
+Counter-poise (Molecule 1, plus ghost atoms)
+-231.544207266282
+-231.964086821501
+-232.275035752003
+-232.071733379315
+Counter-poise (Molecule 2, plus ghost atoms)
+-231.541501063409
+-231.963679656335
+-232.274767371153
+-232.071554702035
+
+
+
+
+
+
+
+
+
+
+Counter-poise Correction
+0.006431654875996
+0.001645147945993
+0.001640765310981
+0.001810121082997
+Binding Energy (Eh)
+0.004769107426
+-0.001470421139999
+-0.003909386654982
+0.001787791046013
+Binding Energy (kcal/mol)
+2.99266073154512
+-0.922703393200503
+-2.45317768750777
+1.12185605852416
+
+
+
+Post-Completion Text:
+Before we get into a discussion about the quality of each of the DFT functionals, I’ll point out that studies using more advanced WFT calculations have found that MP2 somewhat overestimates the dimer binding energy relative to CCSD(T).  In particular, a study with a fairly similar approach found that MP2 gives a binding energy of 2.96 kcal/mol, while CCSD(T) gives a binding energy of 2.17 kcal/mol [https://pubs.acs.org/doi/10.1021/jp961239y].  Ideally, we might hope that the DFT functionals will give us binding energies fairly similar to CCSD(T).
+As you can see, both PBE and B3LYP find that the binding energy is negative - in other words, this particular configuration of the dimer is not energetically favorable, according to PBE and B3LYP.  That’s a rather large qualitative error.
+M06 does noticeably better, with a binding energy of 1.12 kcal/mol.  That’s not too bad, but it’s still more than a kcal/mol away from the CCSD(T) result.  There’s actually a way for us to get more accurate DFT results for this system, which we’ll talk about in the next section.
+Another notable feature of the DFT results is that the CP correction is quite small - less than a third the size of the MP2 CP correction.  This is a common trend.  DFT calculations typically aren’t as sensitive to the size of the basis set as WFT calculations, and you can often get away with using a smaller basis set for DFT.  One natural side-effect of this lessened basis set sensitivity is that basis set superposition error is not quite as much of an issue.
+
+
+Dispersion-Corrected DFT
+
+One of the most fundamental challenges to DFT functionals is proper representation of London dispersion interactions.  This term is related to the fact that what we might call the “dipole” of an atom or molecule is really an average dipole.  In reality, the dipole constantly undergoes small, short-lived fluctuations due to the constant motion of the electrons.  Even noble gas atoms, which on average don’t have a dipole moment, in reality have a small dipole moment that constantly fluctuates along with the motion of the electrons.  For example, if the two electrons in a helium atom happen to be on roughly the same side of the atom at the same moment, the helium atom will, at that moment in time, have a large dipole.
+[Insert figure of one He atom with a temporary dipole]
+If there are any other helium atoms nearby, their electrons will react to the presence of this dipole - with the net result being that the helium atoms will tend to align their instantaneous dipoles with each other.  Dipoles that point in the same direction are attracted to one another, so the outcome of all of this is a small attractive force.  This is the essence of the concept of London dispersion.
+[Insert figure of two He atoms interacting via London dispersion]
+It’s very difficult for semi-local correlation functionals to accurately account for London dispersion, which can operate over a fairly long distance (longer than the distance between neighboring molecules, at any rate).  Quite a bit of research has gone into finding ways of incorporating dispersion into DFT, and there has been significant progress in this area [https://pubs.acs.org/doi/10.1021/ar3000844].
+One of the most common approaches is to add an empirically parameterized potential to account for long-distance dispersion interactions - this is known as a dispersion correction.  The most popular dispersion correction is that of Grimme et. al. [https://pubs.aip.org/aip/jcp/article/132/15/154104/926936].  It’s possible to add this correction to essentially any DFT functional, and many codes allow you to enable it by appending a “-D3” to the end of the functional name: for example, PBE-D3, B3LYP-D3, M06-D3, etc.
+There are actually several different variants of the -D3 correction, including “-D3(BJ)” [https://onlinelibrary.wiley.com/doi/10.1002/jcc.21759], “-D3(CSO)” [https://pubs.acs.org/doi/10.1021/acs.jctc.5b00400], “-D3M(0)” [https://pubs.acs.org/doi/10.1021/acs.jpclett.6b00780], “-D3M(BJ)” [https://pubs.acs.org/doi/10.1021/acs.jpclett.6b00780], and “-D3(op)” [https://pubs.acs.org/doi/10.1021/acs.jctc.7b00176]. The original D3 correction is now known as “D3(0)”.
+This can feel rather intimidating - after wading through the alphabet soup of DFT functionals, now we’ve run into another alphabet soup.  The good news is that most of the time, there isn’t much need to agonize over which specific dispersion correction you use.  As long as you use some sort of vaguely reasonable dispersion correction, you are probably going to get better results than most people running DFT calculations.  Most software packages haven’t implemented every D3 variant for every functional, but simply adding “-D3” to the end of the functional will usually cause them to select a sensible default.
+
+Example 4: Dispersion Correction for the Benzene Dimer
+
+Now let’s repeat the previous calculations, except using the PBE-D3, B3LYP-D3, and M06-D3 functionals.  The relevant MP2/aug-cc-pVDZ geometries are once again provided below.  Place your results in the table.
+
+Here is the optimized, MP2/aug-cc-pVDZ geometry of a single benzene molecule:
+    C           -0.000000000000     1.407916777728     0.000000000000
+    C            0.000000000000    -1.407916777728     0.000000000000
+    C            1.219284868697     0.703956110060     0.000000000000
+    C           -1.219284868697    -0.703956110060     0.000000000000
+    C           -1.219284868697     0.703956110060     0.000000000000
+    C            1.219284868697    -0.703956110060     0.000000000000
+    H           -0.000000000000     2.502066872817     0.000000000000
+    H            0.000000000000    -2.502066872817     0.000000000000
+    H            2.166852596434     1.251022351922     0.000000000000
+    H           -2.166852596434    -1.251022351922     0.000000000000
+    H           -2.166852596434     1.251022351922     0.000000000000
+    H            2.166852596434    -1.251022351922     0.000000000000
+
+
+Here is the optimized, MP2/aug-cc-pVDZ geometry of the benzene dimer in a T-shaped configuration:
+    C           -0.327708761797     1.268942240151    -2.625322917304
+    C            0.342403561708    -1.409795784232    -2.068453438955
+    C            1.024611708935     0.881283771899    -2.554012055608
+    C           -1.009746494697    -1.022936588037    -2.142774451873
+    C           -1.345166158970     0.316957620001    -2.418064323014
+    C            1.359430366290    -0.457740997695    -2.273435363990
+    H           -0.588250242879     2.310107434746    -2.836905363163
+    H            0.603627669837    -2.448832034171    -1.847167142190
+    H            1.814883548124     1.621142477674    -2.711792527507
+    H           -1.800578357920    -1.762307339520    -1.984172694331
+    H           -2.395216456279     0.619133369126    -2.468596982395
+    H            2.409509829243    -0.757236107899    -2.209980462856
+    C           -0.016176076182    -0.189155962542     3.731381782969
+    C            0.001599626245     0.330326646628     0.960895745351
+    C            0.554405965682     1.001550732147     3.241607951242
+    C           -0.567899055972    -0.859407548181     1.452902873009
+    C           -0.578607228823    -1.120119309793     2.836577775660
+    C            0.562525813715     1.259884290009     1.857159508103
+    H           -0.022833123124    -0.390484042539     4.806958122821
+    H            0.009638951897     0.526143555049    -0.113092209897
+    H            0.991245944921     1.724550540417     3.937315255563
+    H           -1.001958610304    -1.579342717724     0.752869494894
+    H           -1.022115876406    -2.045053125969     3.217812252282
+    H            1.005937087036     2.184689017671     1.475052033356
+
+
+
+
+Results:
+
+
+
+MP2
+PBE-D3/MP2
+B3LYP-D3/MP2
+M06-D3/MP2
+B3LYP-D3BJ/MP2
+Benzene
+-231.539651232465
+-231.966152563968
+-232.279259322795
+-232.071618086065
+-232.292930952795
+Benzene Dimer
+-463.090503227232
+-463.937178101355
+-464.563510284243
+-464.148671814259
+-464.591103874244
+Counter-poise (Molecule 1 only)
+-231.539643597886
+-231.966116697274
+-232.279204921876
+-232.071492821932
+-232.292871942701
+Counter-poise (Molecule 2 only)
+-231.539633076929
+-231.966121232616
+-232.279222635967
+-232.071465817603
+-232.292893156357
+Counter-poise (Molecule 1, plus ghost atoms)
+-231.544207266282
+-231.9671453215
+-232.280168872003
+-232.072473849314
+-232.293835892002
+Counter-poise (Molecule 2, plus ghost atoms)
+-231.541501063409
+-231.966737756335
+-232.279899451153
+-232.072294912033
+-232.293569971154
+
+
+
+
+
+
+
+
+
+
+
+
+Counter-poise Correction
+0.006431654875996
+0.001645147944998
+0.001640765313027
+0.001810121811985
+0.001640764097999
+Binding Energy (Eh)
+0.004769107426
+0.003227825474028
+0.003350873339969
+0.003625520317001
+0.003601204556048
+Binding Energy (kcal/mol)
+2.99266073154512
+2.02549149799826
+2.10270521612382
+2.27504883302855
+2.25979045940385
+
+
+Post-Completion Text:
+The dispersion correction made a huge difference!  All three of the functionals do quite well, as long as you include a dispersion correction.  Even the humble PBE functional, which isn’t even a hybrid functional, produces a good result as long as you include the “-D3” (although it would be unwise to assume that this will consistently be true).
+It is unfortunately extremely common for researchers to perform B3LYP calculations on systems with large dispersion interactions, without bothering to include any sort of dispersion correction.  This is very, very bad.  If you only take one point from this entire DFT guide, make sure it’s the following:
+If you are using DFT to study a system that might have non-negligible dispersion interactions, use a dispersion correction!
+This applies to basically any system with non-covalent interactions between molecules.  When in doubt, use a dispersion correction.  When not in doubt, you probably should still consider using a dispersion correction.  If you’re not using a dispersion correction, make sure you know why not.
+
+
+
+
+

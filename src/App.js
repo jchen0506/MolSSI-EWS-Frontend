@@ -1,5 +1,6 @@
-// import logo from './logo.svg';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { marked } from 'marked';
+
 import './App.css';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -21,6 +22,26 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
+	const markdownFilePath = './dft_tutorial.txt';
+
+	// State to store the Markdown content
+	const [markdownContent, setMarkdownContent] = useState('');
+
+	useEffect(() => {
+		const fetchMarkdownContent = async () => {
+			try {
+				const response = await fetch('./dft_tutorial.md');
+				const text = await response.text();
+				console.log(text)
+				setMarkdownContent(text);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+
+		fetchMarkdownContent();
+	}, []);
+
 	const [formSubmitted, setFormSubmitted] = useState(false);
 
 	const handlePostSuccess = () => {
@@ -36,7 +57,9 @@ function App() {
 			<Box sx={{ flexGrow: 1 }}>
 				<Grid container spacing={2}>
 					<Grid item xs={6} md={8}>
-						<Item><Lecture /></Item>
+						<Item>
+							<Lecture markdownContent={markdownContent} />
+						</Item>
 					</Grid>
 					<Grid item xs={6} md={4}>
 						<Item><Quiz /></Item>
