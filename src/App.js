@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { marked } from 'marked';
-
 import './App.css';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -22,7 +20,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
-	const markdownFilePath = './dft_tutorial.txt';
+	const markdownFilePath = './dft_tutorial.md';
 
 	// State to store the Markdown content
 	const [markdownContent, setMarkdownContent] = useState('');
@@ -30,7 +28,7 @@ function App() {
 	useEffect(() => {
 		const fetchMarkdownContent = async () => {
 			try {
-				const response = await fetch('./dft_tutorial.md');
+				const response = await fetch(markdownFilePath);
 				const text = await response.text();
 				console.log(text)
 				setMarkdownContent(text);

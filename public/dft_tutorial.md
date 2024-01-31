@@ -1,4 +1,4 @@
-Density Functional Theory
+# Density Functional Theory
 
 What's The Point of Density Functional Theory? In previous lessons,
 we've covered the fundamental limitations of Hartree-Fock theory, as
@@ -34,7 +34,7 @@ that are likely to be suitable for different types of simulations.
 
 *****
 
-Example 1: DFT for Diatomics Before we think more deeply about the
+**Example 1**: DFT for Diatomics Before we think more deeply about the
 theory of DFT, let's play around with some simple DFT calculations. When
 running DFT calculations, one of the first things you'll need to realize
 is that there is a vast number of different density functionals, with
