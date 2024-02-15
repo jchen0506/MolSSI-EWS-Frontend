@@ -66,6 +66,21 @@ a HF calculation, except that the "Method" you select should be the DFT
 functional you want to use (i.e., PBE, B3LYP, or M06). Add the results
 to the table.
 
+<!-- quiz -->
+## Question 1
+What is DFT?
+- ( ) 3
+- (x) 4
+- ( ) 5
+- ( ) 6
+
+## Question 2
+What is the capital of France?
+- ( ) Berlin
+- (x) Paris
+- ( ) London
+<!-- endquiz -->
+
 *****
 
 Example Input File #1: M06 for HCl

@@ -33,12 +33,7 @@ const Lecture = ({ markdownContent }) => {
 				<Button onClick={prevPage} disabled={currentPage === 0} variant="contained">Go Back</Button>
 				<Button onClick={nextPage} disabled={currentPage === sections.length - 1} variant="contained">Continue</Button>
 			</Stack>
-			{/* <button onClick={prevPage} disabled={currentPage === 0}>
-				Previous
-			</button>
-			<button onClick={nextPage} disabled={currentPage === sections.length - 1}>
-				Next
-			</button> */}
+
 		</div>
 	);
 };

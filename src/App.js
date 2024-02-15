@@ -10,6 +10,7 @@ import Lecture from './Lecture';
 import Quiz from './Quiz'
 import InputForm from './InputForm';
 import Result from './Result'
+import QuizTest from './QuiziTest';
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -30,7 +31,6 @@ function App() {
 			try {
 				const response = await fetch(markdownFilePath);
 				const text = await response.text();
-				console.log(text)
 				setMarkdownContent(text);
 			} catch (error) {
 				console.error(error);
@@ -60,7 +60,7 @@ function App() {
 						</Item>
 					</Grid>
 					<Grid item xs={6} md={4}>
-						<Item><Quiz /></Item>
+						<Item><QuizTest markdownContent={markdownContent} /></Item>
 					</Grid>
 				</Grid>
 			</Box>
