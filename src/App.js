@@ -10,7 +10,7 @@ import Lecture from './Lecture';
 import Quiz from './Quiz'
 import InputForm from './InputForm';
 import Result from './Result'
-import QuizTest from './QuiziTest';
+import QuizTest from './QuiziTest1';
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
