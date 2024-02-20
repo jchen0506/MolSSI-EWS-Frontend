@@ -67,18 +67,16 @@ functional you want to use (i.e., PBE, B3LYP, or M06). Add the results
 to the table.
 
 <!-- quiz -->
-## Question 1
-What is DFT?
+## What is DFT?
 - ( ) 3
 - (x) 4
 - ( ) 5
 - ( ) 6
 
-## Question 2
-What is the capital of France?
+## What is the capital of France?
 - ( ) Berlin
-- (x) Paris
-- ( ) London
+- ( ) Paris
+- (x) London
 <!-- endquiz -->
 
 *****
