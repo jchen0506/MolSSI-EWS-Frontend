@@ -17,8 +17,7 @@ const QuizTest = ({ markdownContent }) => {
 		const tokens = md.parse(markdownContent, {});
 		const parsedQuizzes = parseQuiz(markdownContent);
 		setQuizzes(parsedQuizzes);
-	}, []); // This effect runs once on mount
-	console.log(quizzes);
+	}, []);
 
 	// Handle option selection
 	const handleOptionChange = (quizId, optionIndex) => {
@@ -27,6 +26,7 @@ const QuizTest = ({ markdownContent }) => {
 			[quizId]: optionIndex,
 		});
 	};
+
 	return (
 		<form>
 			{quizzes.map((quiz) => (

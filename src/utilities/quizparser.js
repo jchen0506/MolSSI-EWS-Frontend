@@ -1,6 +1,6 @@
-// import MarkdownIt from 'markdown-it';
+import MarkdownIt from 'markdown-it';
 
-// const md = new MarkdownIt();
+const md = new MarkdownIt();
 
 export function parseQuiz(markdown) {
 	const quizRegex = /<!-- quiz -->([\s\S]*?)<!-- endquiz -->/g;

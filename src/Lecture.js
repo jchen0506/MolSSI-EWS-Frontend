@@ -6,7 +6,10 @@ import MarkdownIt from 'markdown-it';
 
 const Lecture = ({ markdownContent }) => {
 	const md = new MarkdownIt();
-	const sections = markdownContent.split('*****'); // Split the content into sections
+	const quizRegex = /<!-- quiz -->([\s\S]*?)<!-- endquiz -->/g;
+
+	const markdownWithoutQuizzes = markdownContent.replace(quizRegex, '');
+	const sections = markdownWithoutQuizzes.split('*****');
 
 	const [currentPage, setCurrentPage] = useState(0);
 
