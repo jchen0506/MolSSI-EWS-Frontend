@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -12,6 +12,8 @@ import InputForm from './InputForm';
 import Result from './Result'
 import QuizTest from './QuiziTest1';
 
+import { parseQuiz } from './utilities/quizparser';
+
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
 	...theme.typography.body2,
@@ -20,25 +22,44 @@ const Item = styled(Paper)(({ theme }) => ({
 	color: theme.palette.text.secondary,
 }));
 
-function App() {
+// Create DataContext
+const DataContext = createContext();
+
+export const useData = () => useContext(DataContext);
+
+const DataProvider = ({ children }) => {
+	const [currentPage, setCurrentPage] = useState(0);
+	const [markdownContent, setMarkdownContent] = useState({ content: [], quizzes: [] });
 	const markdownFilePath = './dft_tutorial.md';
 
-	// State to store the Markdown content
-	const [markdownContent, setMarkdownContent] = useState('');
-
 	useEffect(() => {
-		const fetchMarkdownContent = async () => {
-			try {
-				const response = await fetch(markdownFilePath);
-				const text = await response.text();
-				setMarkdownContent(text);
-			} catch (error) {
-				console.error(error);
-			}
-		};
+		// Simulate fetching the markdown file, in reality, you would fetch this from your server or public folder
+		fetch(markdownFilePath)
+			.then((response) => response.text())
+			.then((text) => {
+				const content = text.split('*****').map((page) => page.trim());
+				const quizzes = content.map((page) => parseQuiz(page));
 
-		fetchMarkdownContent();
+				setMarkdownContent({ content, quizzes });
+			});
 	}, []);
+
+	const goToNextPage = () => {
+		setCurrentPage((prevPage) => Math.min(prevPage + 1, markdownContent.content.length - 1));
+	};
+
+	const goToPreviousPage = () => {
+		setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+	};
+
+	return (
+		<DataContext.Provider value={{ currentPage, goToNextPage, goToPreviousPage, markdownContent }}>
+			{children}
+		</DataContext.Provider>
+	);
+};
+
+function App() {
 
 	const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -48,41 +69,44 @@ function App() {
 	};
 
 	return (
-		<div className="App">
-			<NavBar />
-			<br />
-			<br />
-			<Box sx={{ flexGrow: 1 }}>
-				<Grid container spacing={2}>
-					<Grid item xs={6} md={8}>
-						<Item>
-							<Lecture markdownContent={markdownContent} />
-						</Item>
+		<DataProvider>
+			<div className="App">
+				<NavBar />
+				<br />
+				<br />
+				<Box sx={{ flexGrow: 1 }}>
+					<Grid container spacing={2}>
+						<Grid item xs={6} md={8}>
+							<Item>
+								<Lecture />
+							</Item>
+						</Grid>
+						<Grid item xs={6} md={4}>
+							<Item><QuizTest /></Item>
+						</Grid>
 					</Grid>
-					<Grid item xs={6} md={4}>
-						<Item><QuizTest markdownContent={markdownContent} /></Item>
+				</Box>
+				<br />
+				<br />
+				<Box sx={{ flexGrow: 1 }}>
+					<Grid container spacing={2}>
+						<Grid item xs={6} md={6}>
+							<Item>
+								<InputForm onPostSuccess={handlePostSuccess} />
+							</Item>
+						</Grid>
+						<Grid item xs={6} md={6}>
+							<Item>Result
+							</Item>
+							<Item>
+								{formSubmitted && <Result />}
+							</Item>
+						</Grid>
 					</Grid>
-				</Grid>
-			</Box>
-			<br />
-			<br />
-			<Box sx={{ flexGrow: 1 }}>
-				<Grid container spacing={2}>
-					<Grid item xs={6} md={6}>
-						<Item>
-							<InputForm onPostSuccess={handlePostSuccess} />
-						</Item>
-					</Grid>
-					<Grid item xs={6} md={6}>
-						<Item>Result
-						</Item>
-						<Item>
-							{formSubmitted && <Result />}
-						</Item>
-					</Grid>
-				</Grid>
-			</Box>
-		</div>
+				</Box>
+			</div>
+		</DataProvider>
+
 	);
 }
 
