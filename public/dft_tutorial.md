@@ -75,8 +75,8 @@ to the table.
 
 ## What is the capital of France?
 - ( ) Berlin
-- ( ) Paris
-- (x) London
+- ( ) London
+- (x) Paris
 <!-- endquiz -->
 
 *****

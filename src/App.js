@@ -13,6 +13,7 @@ import Result from './Result'
 import QuizTest from './QuiziTest1';
 
 import { parseQuiz } from './utilities/quizparser';
+import MarkdownIt from 'markdown-it';
 
 const Item = styled(Paper)(({ theme }) => ({
 	backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -30,19 +31,28 @@ export const useData = () => useContext(DataContext);
 const DataProvider = ({ children }) => {
 	const [currentPage, setCurrentPage] = useState(0);
 	const [markdownContent, setMarkdownContent] = useState({ content: [], quizzes: [] });
+	const md = new MarkdownIt();
 	const markdownFilePath = './dft_tutorial.md';
 
 	useEffect(() => {
-		// Simulate fetching the markdown file, in reality, you would fetch this from your server or public folder
-		fetch(markdownFilePath)
-			.then((response) => response.text())
-			.then((text) => {
-				const content = text.split('*****').map((page) => page.trim());
-				const quizzes = content.map((page) => parseQuiz(page));
-
-				setMarkdownContent({ content, quizzes });
-			});
-	}, []);
+		const fetchAndParseMarkdown = async () => {
+			try {
+				const response = await fetch(markdownFilePath);
+				const text = await response.text();
+				const content = text.split('*****').map(page => page.trim());
+				const quizzes = content.map(page => parseQuiz(page));
+				// Use markdown-it to parse each page's content (excluding quizzes if needed)
+				const parsedContent = content.map(page => {
+					const pageWithoutQuiz = page.replace(/<!-- quiz -->[\s\S]*?<!-- endquiz -->/g, '');
+					return md.render(pageWithoutQuiz);
+				});
+				setMarkdownContent({ content: parsedContent, quizzes });
+			} catch (error) {
+				console.error("Failed to fetch and parse markdown:", error);
+			}
+		};
+		fetchAndParseMarkdown();
+	}, [md]);
 
 	const goToNextPage = () => {
 		setCurrentPage((prevPage) => Math.min(prevPage + 1, markdownContent.content.length - 1));
