@@ -31,7 +31,6 @@ certain types of chemical systems might do very poorly for others. By
 the end of this lesson, you'll learn more about the theory behind DFT,
 the advantages and disadvantages it offers, and the types of functionals
 that are likely to be suitable for different types of simulations.
-
 *****
 
 **Example 1**: DFT for Diatomics Before we think more deeply about the

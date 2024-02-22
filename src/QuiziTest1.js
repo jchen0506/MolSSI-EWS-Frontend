@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MarkdownIt from 'markdown-it';
 import { parseQuiz } from './utilities/quizparser';
 import { useData } from './App'; // Adjust import based on actual file structure
@@ -6,27 +6,44 @@ import { useData } from './App'; // Adjust import based on actual file structure
 const QuizTest = () => {
 	const { currentPage, markdownContent } = useData();
 	const [userAnswers, setUserAnswers] = useState({});
+	const currentQuiz = markdownContent.quizzes[currentPage];
+	const [checkedAnswers, setCheckedAnswers] = useState(false);
+	const prevPageRef = useRef(currentPage);
+
 
 	useEffect(() => {
-		const currentQuiz = markdownContent.quizzes[currentPage];
-		if (currentQuiz && currentQuiz.length > 0) {
+		// Reset userAnswers only when navigating to a new page
+		if (prevPageRef.current !== currentPage && currentQuiz) {
 			setUserAnswers(currentQuiz.reduce((acc, quiz) => {
 				acc[quiz.id] = null; // Initialize selection for each quiz as null
 				return acc;
 			}, {}));
 		}
-	}, [currentPage, markdownContent.quizzes]);
+		prevPageRef.current = currentPage;
+		setCheckedAnswers(false);
+	}, [currentPage, currentQuiz]);
 
 	const handleOptionChange = (quizId, optionIndex) => {
-		setUserAnswers(prevAnswers => ({
-			...prevAnswers,
-			[quizId]: optionIndex,
+		setUserAnswers((prevUserAnswers) => ({
+			...prevUserAnswers,
+			[quizId]: optionIndex
 		}));
 	};
 
+	const checkAnswers = () => {
+		setCheckedAnswers(true);
+	};
+
+	const getOptionStyle = (quizId, optionIndex) => {
+
+		if (checkedAnswers && userAnswers[quizId] !== undefined) {
+			const correctOption = currentQuiz.find(quiz => quiz.id === quizId).correctOption;
+			return userAnswers[quizId] === correctOption ? 'green' : 'red';
+		}
+		return '';
+	};
+
 	// Only render if the current page contains quizzes
-	const currentQuiz = markdownContent.quizzes[currentPage];
-	// Only render if the current page has a quiz
 	if (!currentQuiz || currentQuiz.length === 0) {
 		return null;
 	}
@@ -38,7 +55,7 @@ const QuizTest = () => {
 					<h2>{quiz.question}</h2>
 					{quiz.options.map((option, index) => (
 						<div key={index}>
-							<label>
+							<label style={{ color: getOptionStyle(quiz.id, index) }}>
 								<input
 									type="radio"
 									name={`question_${quiz.id}`}
@@ -50,8 +67,12 @@ const QuizTest = () => {
 							</label>
 						</div>
 					))}
+					{checkedAnswers && (
+						<div>Correct answer: {quiz.options[quiz.correctOption]}</div>
+					)}
 				</div>
 			))}
+			<button type="button" onClick={checkAnswers}>Check Answers</button>
 		</form>
 	);
 };
